@@ -44,7 +44,7 @@ public class AnimControl : MonoBehaviour
 		frameRate = currentState.clip.frameRate;
 
 		animTimer = 0;
-		Debug.Log (currentState.clip.frameRate);
+
 		anim.Play(currentState.name);
 	}
 

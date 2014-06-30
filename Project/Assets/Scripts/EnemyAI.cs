@@ -21,7 +21,7 @@ public class EnemyAI : MonoBehaviour {
 
 	private Vector3 currentPathTarget;
 
-	private Character enemy;
+	private Character character;
 	private Character target; 
 
 	public delegate void State();
@@ -36,11 +36,11 @@ public class EnemyAI : MonoBehaviour {
 
 	void Start () 
 	{
-		enemy = GetComponent<Character>();
-		path = new Path(enemy);
+		character = GetComponent<Character>();
+		path = new Path(character);
 
 		if(hasWeapon)
-			enemy.SpawnWeapon(weaponPrefab);	
+			character.SpawnWeapon(weaponPrefab);	
 
 		target = Player.Instance.character;
 
@@ -67,13 +67,16 @@ public class EnemyAI : MonoBehaviour {
 
 	void SetPatrolState()
 	{
-		currentPathTarget = patrolPath[pathIndex].position;
+		//currentPathTarget = patrolPath[pathIndex].position;
 		state = PatrolState;
 	}
 
 	void PatrolState()
 	{
-		Vector3 dir = currentPathTarget - enemy.pos;
+		//***Disabled for now
+		return;
+
+		/*Vector3 dir = currentPathTarget - character.pos;
 		float dist = dir.magnitude;
 
 		if(dist < 0.2f)
@@ -87,16 +90,16 @@ public class EnemyAI : MonoBehaviour {
 		else
 		{
 			dir.Normalize();
-			enemy.Move(dir.x * 0.15f, dir.z * 0.15f);
+			character.Move(dir.x * 0.15f, dir.z * 0.15f);
 		}
 
-		enemy.Aim(dir.normalized);
+		character.Aim(dir.normalized);
 
 		if(!Player.IsActive)
 			return;
 
 		if(PlayerSpotted())
-			SetChaseState();
+			SetChaseState();*/
 	}
 
 
@@ -106,7 +109,7 @@ public class EnemyAI : MonoBehaviour {
 		{
 			SetTargetDeadState();
 		}
-		else if(enemy.GetCarriedWeapon())
+		else if(character.GetCurrentWeapon())
 		{
 			state = ChaseState;
 		}
@@ -132,14 +135,14 @@ public class EnemyAI : MonoBehaviour {
 			path.DrawCurrentPath();
 
 		Vector3 dir = path.GetDirection();
-		enemy.Move(dir.x * chaseSpeed, dir.z * chaseSpeed);
+		character.Move(dir.x * chaseSpeed, dir.z * chaseSpeed);
 
 		if(PlayerSpotted())
 		{
-			float dist = Vector3.Distance(target.pos, enemy.pos);
+			float dist = Vector3.Distance(target.pos, character.pos);
 			AimAtPlayer();
 
-			Weapon weapon = enemy.GetCurrentWeapon();
+			Weapon weapon = character.GetCurrentWeapon();
 
 			if(weapon.hasRangedAttack)
 			{
@@ -161,28 +164,19 @@ public class EnemyAI : MonoBehaviour {
 
 	void SetMeleeState ()
 	{
+		Weapon weapon = character.GetCurrentWeapon();
+		weapon.Draw();
+
 		state = MeleeState;
 	}
 
 	void MeleeState ()
 	{
-		Weapon weapon = enemy.GetCurrentWeapon();
+		Weapon weapon = character.GetCurrentWeapon();
 
-		if(weapon.isAttacking)
+		if(weapon.isDrawn)
 		{
-			if(meleeTimer > 0)
-			{
-				meleeTimer -= Time.deltaTime;
-			}
-			else
-			{
-				weapon.MeleeReturn();
-				SetCooldownState(cooldownDelay);
-			}
-		}
-		else
-		{
-			if(Vector3.Distance(enemy.pos, target.pos) > 8f)
+			if(Vector3.Distance(character.pos, target.pos) > 8f)
 			{
 				SetChaseState();
 			}
@@ -190,12 +184,20 @@ public class EnemyAI : MonoBehaviour {
 			{
 				float targetAngle = AimAtPlayer();
 
-				if(targetAngle < 20f)
+				if(targetAngle < 50f && weapon.isFullyDrawn)
 				{
 					weapon.MeleeAttack();
+
 					meleeTimer = meleeDelay;
 				}
 			}
+		}
+		else
+		{
+			if(meleeTimer > 0)
+				meleeTimer -= Time.deltaTime;
+			else
+				SetCooldownState(cooldownDelay);
 		}
 	}
 
@@ -222,7 +224,7 @@ public class EnemyAI : MonoBehaviour {
 
 	void ReadyState()
 	{
-		Weapon currentWeapon = enemy.GetCurrentWeapon();
+		Weapon currentWeapon = character.GetCurrentWeapon();
 
 		if(currentWeapon.isDrawn)
 		{
@@ -243,8 +245,8 @@ public class EnemyAI : MonoBehaviour {
 
 	void SetThrowState()
 	{
-		Weapon currentWeapon = enemy.GetCurrentWeapon();
-		currentWeapon.RangedAttack();
+		Weapon currentWeapon = character.GetCurrentWeapon();
+		currentWeapon.Attack();
 
 		state = ThrowState;
 	}
@@ -261,13 +263,13 @@ public class EnemyAI : MonoBehaviour {
 
 	void FindSpearState()
 	{
-		Weapon grabbedWeapon = enemy.GetGrabbedWeapon();
+		Weapon grabbedWeapon = character.GetGrabbedWeapon();
 		
 		if(grabbedWeapon)
 		{
 			//Pickup spear and chase
-			enemy.PickupWeapon();
-			Weapon currentWeapon = enemy.GetCurrentWeapon();
+			character.PickupWeapon();
+			Weapon currentWeapon = character.GetCurrentWeapon();
 
 			if(currentWeapon && currentWeapon.isCarried)			
 				SetChaseState();
@@ -275,7 +277,7 @@ public class EnemyAI : MonoBehaviour {
 		else
 		{
 			//Find spear
-			Weapon nearestWeapon = WeaponManager.Instance.GetNearestFreeWeapon(enemy.pos, enemy);
+			Weapon nearestWeapon = WeaponManager.Instance.GetNearestFreeWeapon(character.pos, character);
 			
 			if(nearestWeapon)
 			{
@@ -283,16 +285,16 @@ public class EnemyAI : MonoBehaviour {
 				path.UpdatePath(spearPos);
 
 				Vector3 dir = path.GetDirection();
-				enemy.Move(dir.x * findSpearSpeed, dir.z * findSpearSpeed);
+				character.Move(dir.x * findSpearSpeed, dir.z * findSpearSpeed);
 			}
 
 			if(debug)
 				path.DrawCurrentPath();
 
 			//Grab spear
-			if(enemy.GetWeaponsInReach().Count > 0)
+			if(character.GetWeaponsInReach().Count > 0)
 			{
-				enemy.GrabWeapon();
+				character.GrabWeapon();
 			}
 		}
 	}
@@ -308,7 +310,7 @@ public class EnemyAI : MonoBehaviour {
 	
 	void FixedUpdate () 
 	{
-		if(enemy.GetIsDead())
+		if(character.GetIsDead())
 			return;
 
 		if(state != null)
@@ -326,8 +328,8 @@ public class EnemyAI : MonoBehaviour {
 	private bool PlayerSpotted()
 	{
 		//***add aditional spot logic here
-		Vector3 lookDir = target.pos - enemy.pos;
-		Ray ray = new Ray(enemy.pos + lookDir.normalized, lookDir);
+		Vector3 lookDir = target.pos - character.pos;
+		Ray ray = new Ray(character.pos + lookDir.normalized, lookDir);
 		RaycastHit hit = new RaycastHit();
 
 		if(Physics.Raycast(ray, out hit))
@@ -345,10 +347,10 @@ public class EnemyAI : MonoBehaviour {
 	
 	protected float AimAtPlayer()
 	{
-		Vector3 aim = target.pos - enemy.hand.transform.position;
-		enemy.Aim(aim);
+		Vector3 aim = target.pos - character.hand.transform.position;
+		character.Aim(aim);
 
-		return Vector3.Angle(aim, enemy.handHolder.transform.forward);
+		return Vector3.Angle(aim, character.handHolder.transform.forward);
 	}
 
 	void OnDrawGizmos()
