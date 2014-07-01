@@ -167,8 +167,8 @@ public class EnemyAI : MonoBehaviour {
 		if(debug)
 			path.DrawCurrentPath();
 
-		Vector3 dir = path.GetDirection();
-		character.Move(dir.x * chaseSpeed, dir.z * chaseSpeed);
+		Vector3 moveDir = path.GetDirection();
+		character.Move(moveDir.x * chaseSpeed, moveDir.z * chaseSpeed);
 
 		if(TargetSpotted())
 		{
@@ -192,6 +192,10 @@ public class EnemyAI : MonoBehaviour {
 					SetMeleeState();
 				}
 			}
+		}
+		else
+		{
+			AimInDirection(moveDir);
 		}
 	}
 
@@ -305,7 +309,7 @@ public class EnemyAI : MonoBehaviour {
 	void FindWeaponState()
 	{
 		Weapon grabbedWeapon = character.GetGrabbedWeapon();
-		
+
 		if(grabbedWeapon)
 		{
 			//Pickup spear and chase
@@ -335,6 +339,7 @@ public class EnemyAI : MonoBehaviour {
 			//Grab spear
 			if(character.GetWeaponsInReach().Count > 0)
 			{
+				//character.PickupWeapon();
 				character.GrabWeapon();
 			}
 		}
@@ -389,9 +394,17 @@ public class EnemyAI : MonoBehaviour {
 	protected float AimAtPlayer()
 	{
 		Vector3 aim = target.pos - character.hand.transform.position;
+
 		character.Aim(aim);
 
 		return Vector3.Angle(aim, character.handHolder.transform.forward);
+	}
+
+	protected float AimInDirection(Vector3 dir)
+	{
+		character.Aim(dir);
+
+		return Vector3.Angle(dir, character.handHolder.transform.forward);
 	}
 
 	void OnDrawGizmos()
