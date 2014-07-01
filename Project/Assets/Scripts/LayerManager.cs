@@ -5,6 +5,7 @@ public class LayerManager : MonoBehaviour
 {
 	public LayerMask spearStab;
 	public LayerMask laserBeam;
+	public LayerMask enemySight;
 
 	public static LayerManager Instance;
 
@@ -21,5 +22,10 @@ public class LayerManager : MonoBehaviour
 	public static LayerMask GetLaserBeam()
 	{
 		return LayerManager.Instance.laserBeam;
+	}
+
+	public static LayerMask GetEnemySight()
+	{
+		return LayerManager.Instance.enemySight;
 	}
 }

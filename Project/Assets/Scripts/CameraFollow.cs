@@ -19,6 +19,9 @@ public class CameraFollow : MonoBehaviour
 
 	void FixedUpdate () 
 	{
+		if(!target)
+			return;
+
 		Vector3 targetPos = target.position;
 		Vector3 nextPos = transform.position;
 		targetPos.y = nextPos.y;

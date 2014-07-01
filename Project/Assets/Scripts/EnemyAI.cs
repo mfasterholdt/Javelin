@@ -6,6 +6,7 @@ public class EnemyAI : MonoBehaviour {
 	public GameObject weaponPrefab;
 	public bool hasWeapon;
 	public bool isPatrolling;
+	public bool isStationary;
 
 	public Transform[] patrolPath;
 	public int pathIndex;
@@ -44,9 +45,18 @@ public class EnemyAI : MonoBehaviour {
 
 		target = Player.Instance.character;
 
-		if(isPatrolling)
+		SetDefaultState();
+	}
+
+	void SetDefaultState()
+	{		
+		if(target.GetIsDead())
+			SetTargetDeadState();
+		else if(isPatrolling)
 			SetPatrolState();
-		else
+		else if(isStationary)
+			SetStationaryState();
+		else 
 			SetIdleState();
 	}
 
@@ -102,20 +112,43 @@ public class EnemyAI : MonoBehaviour {
 			SetChaseState();*/
 	}
 
+	void SetStationaryState()
+	{
+		state = StationaryState;
+	}
+
+	void StationaryState ()
+	{
+		if(!Player.IsActive)
+			return;
+
+		if(TargetSpotted())
+		{
+			float targetAngle = AimAtPlayer();
+			Weapon currentWeapon = character.GetCurrentWeapon();
+
+			if(currentWeapon.isDrawn)
+			{
+				if(targetAngle < 5f)
+					SetAttackState();
+			}
+			else
+			{
+				SetReadyState();
+			}
+		}
+	}
 
 	void SetChaseState()
 	{
-		if(target.GetIsDead())
-		{
-			SetTargetDeadState();
-		}
-		else if(character.GetCurrentWeapon())
+
+		if(character.GetCurrentWeapon())
 		{
 			state = ChaseState;
 		}
 		else
 		{
-			SetFindSpearState();
+			SetFindWeaponState();
 		}
 	}
 
@@ -137,7 +170,7 @@ public class EnemyAI : MonoBehaviour {
 		Vector3 dir = path.GetDirection();
 		character.Move(dir.x * chaseSpeed, dir.z * chaseSpeed);
 
-		if(PlayerSpotted())
+		if(TargetSpotted())
 		{
 			float dist = Vector3.Distance(target.pos, character.pos);
 			AimAtPlayer();
@@ -228,14 +261,21 @@ public class EnemyAI : MonoBehaviour {
 
 		if(currentWeapon.isDrawn)
 		{
-			AimAtPlayer();
+			float targetAngle = AimAtPlayer();
 
-			//*** wait for aim to lign up
-
-			if(timer > 0)
-				timer -= Time.deltaTime;
+			if(currentWeapon is Laser)
+			{
+				if(targetAngle < 3f)
+					SetAttackState();
+			}
 			else
-				SetThrowState();
+			{
+				//*** wait for aim to lign up
+				if(timer > 0)
+					timer -= Time.deltaTime;
+				else
+					SetAttackState();
+			}
 		}
 		else
 		{
@@ -243,25 +283,26 @@ public class EnemyAI : MonoBehaviour {
 		}
 	}
 
-	void SetThrowState()
+	void SetAttackState()
 	{
 		Weapon currentWeapon = character.GetCurrentWeapon();
 		currentWeapon.Attack();
 
-		state = ThrowState;
+		state = AttackState;
 	}
 
-	void ThrowState()
+	void AttackState()
 	{
-		SetFindSpearState();
+		//***probably timer or logic here before returning to default state
+		SetDefaultState();
 	}
 
-	void SetFindSpearState()
+	void SetFindWeaponState()
 	{
-		state = FindSpearState;
+		state = FindWeaponState;
 	}
 
-	void FindSpearState()
+	void FindWeaponState()
 	{
 		Weapon grabbedWeapon = character.GetGrabbedWeapon();
 		
@@ -325,14 +366,14 @@ public class EnemyAI : MonoBehaviour {
 		}
 	}
 
-	private bool PlayerSpotted()
+	private bool TargetSpotted()
 	{
 		//***add aditional spot logic here
 		Vector3 lookDir = target.pos - character.pos;
 		Ray ray = new Ray(character.pos + lookDir.normalized, lookDir);
 		RaycastHit hit = new RaycastHit();
 
-		if(Physics.Raycast(ray, out hit))
+		if(Physics.Raycast(ray, out hit, 30f, LayerManager.GetEnemySight()))
 		{
 			Rigidbody r = hit.collider.attachedRigidbody;
 

@@ -18,6 +18,12 @@ public class Laser : Weapon
 	private Vector3 attackDir;
 	private Vector3 impactPos;
 
+	public override void SetLyingState (Vector3 force)
+	{
+		beam.gameObject.SetActive(false);
+		base.SetLyingState (force);
+	}
+
 	public void SetDrawnState()
 	{
 		drawnTimer = 0;
@@ -139,7 +145,9 @@ public class Laser : Weapon
 	{
 		if(isAttacking)
 			return 0f;
-		
-		return rotationForce * 0.3f;
+		if(isDrawn)
+			return rotationForce * 0.7f;
+		else
+			return rotationForce * 0.3f;
 	}
 }

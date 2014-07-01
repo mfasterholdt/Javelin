@@ -119,7 +119,18 @@ public class Character : WorldObject
 	{
 		health = 0;
 		Die();
-		Destroy(gameObject);
+
+		//*** add effect instead of detroying here
+		visuals.gameObject.SetActive(false);
+
+		if(!rigidbody.isKinematic)
+			rigidbody.velocity *= 0.2f;
+
+		mainCollider.gameObject.SetActive(false);
+
+		if(aim)
+			aim.gameObject.SetActive(false);
+		//rigidbody.isKinematic = true;
 	}
 
 	void Die()
