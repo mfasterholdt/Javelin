@@ -115,6 +115,24 @@ public class Character : WorldObject
 			Die();
 	}
 
+	public void Explode(Vector3 force)
+	{
+		health = 0;
+		Die();
+
+		//*** add effect instead of detroying here
+		visuals.gameObject.SetActive(false);
+
+		if(!rigidbody.isKinematic)
+			rigidbody.velocity *= 0.2f;
+
+		mainCollider.gameObject.SetActive(false);
+
+		if(aim)
+			aim.gameObject.SetActive(false);
+		//rigidbody.isKinematic = true;
+	}
+
 	void Die()
 	{
 		DropWeapon();
@@ -193,8 +211,6 @@ public class Character : WorldObject
 		Vector3 nextAim = Vector3.Slerp(characterTransform.forward, aimTarget, Time.deltaTime * currentRotationSpeed); 
 		nextAim.y = 0;
 		characterRigidbody.MoveRotation(Quaternion.LookRotation(nextAim));
-
-
 	}
 
 	public Weapon GetCurrentWeapon()
@@ -236,34 +252,57 @@ public class Character : WorldObject
 			return;
 		
 		Weapon optimalWeapon = null;
-
+		
 		for(int i = 0, count = weaponsInReach.Count; i < count; i++)
 		{
 			Weapon weapon = weaponsInReach[i];
-
+			
 			if(weapon.GrabCheck(this))
 				optimalWeapon = weapon;
 		}
 
-		//Grab spear
 		if(optimalWeapon)
 		{
 			currentWeapon = optimalWeapon;
-
+										
 			characterRigidbody.velocity = Vector3.zero;
 			characterRigidbody.transform.rotation = currentWeapon.transform.rotation; //Look at spear
-
 			currentWeapon.Grab(this);
 		}
 	}
 
 	public void PickupWeapon ()
 	{
-		if(!currentWeapon || !currentWeapon.PickupCheck(this))
-			return;
+		if(currentWeapon)
+		{
+			if(currentWeapon.PickupCheck(this))
+				currentWeapon.Pickup();
+		}
+		else
+		{
+			Weapon optimalWeapon = null;
+			
+			for(int i = 0, count = weaponsInReach.Count; i < count; i++)
+			{
+				Weapon weapon = weaponsInReach[i];
+				
+				if(weapon.isLying)
+					optimalWeapon = weapon;
+			}
+
+			if(optimalWeapon)
+			{
+				currentWeapon = optimalWeapon;
+
+				optimalWeapon.Pickup(this);
+			}
+		}
+
+		//if(!currentWeapon || !currentWeapon.PickupCheck(this))
+		//	return;
 
 		//***Animations? or controlled  by parameter		
-		currentWeapon.Pickup();
+
 	}
 
 	public void DropWeapon()
@@ -292,7 +331,7 @@ public class Character : WorldObject
 		else 
 			return true;
 	}
-	
+
 	public override void Impale(Spear spear, Vector3 force)
 	{
 		impaleObjects.Add(spear);
@@ -385,6 +424,14 @@ public class Character : WorldObject
 		ResetSpearHand();
 	}
 
+	public void ExplosiveImpact(Vector3 force, int damage)
+	{
+		if(health > damage)
+			Damage(damage);
+		else
+			Explode(force);
+	}
+
 	public void Scratch(Vector3 dir, float force)
 	{
 		BloodSplatter newSplatter = BloodManager.Instance.CreateBloodSplatter(characterTransform, transform.position + dir, dir);
@@ -412,10 +459,10 @@ public class Character : WorldObject
 
 	public void SpawnWeapon(GameObject weaponPrefab)
 	{
-		GameObject newSpearObj = Instantiate(weaponPrefab, hand.position, hand.rotation) as GameObject;
-		newSpearObj.transform.parent = hand;
+		GameObject newWeaponObj = Instantiate(weaponPrefab, hand.position, hand.rotation) as GameObject;
+		newWeaponObj.transform.parent = hand;
 		
-		currentWeapon = newSpearObj.GetComponent<Weapon>();
+		currentWeapon = newWeaponObj.GetComponent<Weapon>();
 		currentWeapon.owner = this;
 
 		currentWeapon.Pickup();

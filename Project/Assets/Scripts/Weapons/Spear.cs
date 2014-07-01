@@ -15,18 +15,10 @@ public class Spear : Weapon
 	private float drawnTimer;
 
 	public override bool isFlying{ get{ return state == FlyingState;} }
-	public override bool isCarried{ get{ return state == CarryState;} }
 	public override bool isGrabbed{ get{ return state == GrabbedState;} }
 	public override bool isAttacking{ get{return state == AttackState;} }
 	public override bool isDrawn{ get{return state == DrawnState;} }
 	public override bool isImpaling{ get{return state == ImpaleState;} }
-	public override bool isLying {get{return state == LyingState;} }
-	
-	void Start()
-	{
-		if(state == null)
-			SetLyingState(Vector3.zero);
-	}
 
 	public void SetDrawnState()
 	{
@@ -36,7 +28,6 @@ public class Spear : Weapon
 
 	private void DrawnState()
 	{
-
 		drawnTimer += Time.deltaTime;
 	}
 
@@ -128,13 +119,12 @@ public class Spear : Weapon
 		}
 	}
 
-
 	public override float GetDrawnTimer()
 	{
 		return drawnTimer;
 	}
 
-	public override void RangedAttack()
+	public override void Attack()
 	{
 		if(!isDrawn)
 			return;
@@ -188,7 +178,7 @@ public class Spear : Weapon
 			return Vector3.zero;
 
 		if(isGrabbed)
-			return moveForce * 0.075f;
+			return moveForce * 0.2f;
 
 		//Vector3 adjustedMove = moveForce - moveForce * 2f; //***Get weight here
 		//Debug.Log(Vector3.Dot(adjustedMove, moveForce));
@@ -237,8 +227,12 @@ public class Spear : Weapon
 		return null;
 	}
 
-	public override void Pickup ()
+	public override void Pickup (Character character = null)
 	{
+		if(character)
+			owner = character;
+
+
 		WorldObject impaleObject = GetImpaleObject();
 		
 		if(impaleObject)
@@ -255,10 +249,11 @@ public class Spear : Weapon
 
 	public override bool GrabCheck(Character character)
 	{
-		if(isImpaling || isLying || (character.catchMidair && isFlying && owner != character))
+		if(isImpaling || (character.catchMidair && isFlying && owner != character))
 		{
 			//Cannot pull weapon from self
 			WorldObject obj = GetImpaleObject();
+
 			if(obj && obj == character && !character.pullWeaponFromSelf)
 				return false;
 
@@ -288,7 +283,7 @@ public class Spear : Weapon
 		for(int i = 0, count = impaleTargets.Count; i < count; i++)
 		{
 			WorldObject target = impaleTargets[i];
-
+			
 			if(target.IsStatic())
 				return true;
 		}

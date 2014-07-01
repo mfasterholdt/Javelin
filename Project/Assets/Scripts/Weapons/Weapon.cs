@@ -13,17 +13,25 @@ public class Weapon : MonoBehaviour
 	public Character owner;
 
 	public virtual bool isFlying{ get{ return false;} }
-	public virtual bool isCarried{ get{ return false;} }
 	public virtual bool isGrabbed{ get{ return false;} }
 	public virtual bool isAttacking{ get{return false;} }
 	public virtual bool isDrawn{ get{return false;} }
+	public virtual bool isFullyDrawn{ get{return false;} }	
 	public virtual bool isImpaling{ get{return false;} }
-	public virtual bool isLying {get{return false;} }
+
+	public virtual bool isCarried{ get{ return state == CarryState;} }	
+	public virtual bool isLying {get{return state == LyingState;} }
 
 	public string stateName;
 	protected delegate void State();
 	protected State state;
-	
+
+	protected virtual void Start()
+	{
+		if(state == null)
+			SetLyingState(Vector3.zero);
+	}
+
 	protected virtual void OnEnable()
 	{
 		WeaponManager.Instance.AddWeapon(this);
@@ -38,6 +46,8 @@ public class Weapon : MonoBehaviour
 
 	public virtual void SetCarryState()
 	{
+		rigidbody.isKinematic = true;
+
 		state = CarryState;
 	}
 	
@@ -110,7 +120,7 @@ public class Weapon : MonoBehaviour
 		return 0f;
 	}
 
-	public virtual void RangedAttack(){}
+	public virtual void Attack(){}
 	
 	public virtual void Drop(Vector3 force)
 	{
@@ -127,8 +137,11 @@ public class Weapon : MonoBehaviour
 		return false;
 	}
 
-	public virtual void Pickup()
+	public virtual void Pickup(Character character = null)
 	{
+		if(character)
+			owner = character;
+
 		transform.parent = owner.hand.transform;
 		transform.position = owner.hand.position;
 		transform.rotation = owner.hand.rotation;

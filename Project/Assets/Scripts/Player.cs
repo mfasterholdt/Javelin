@@ -10,8 +10,9 @@ public class Player : MonoBehaviour
 	public bool hasWeapon = true;
 
 	public static Player Instance;
-
 	public static bool IsActive;
+
+	private float previousInputRightTrigger;
 
 	void Awake()
 	{
@@ -58,21 +59,30 @@ public class Player : MonoBehaviour
 
 	void WeaponInput ()
 	{
+		bool inputRightBumper = Input.GetButtonDown("RightBumper");
+		if(inputRightBumper)
+			character.DropWeapon();
+
 		float inputRightTrigger = Input.GetAxis("RightTrigger");
-		float inputLeftTrigger = Input.GetAxis("LeftTrigger");
+		//float inputLeftTrigger = Input.GetAxis("LeftTrigger");
 
 		Weapon currenWeapon = character.GetCurrentWeapon();
 
-		if(currenWeapon)
+		if(previousInputRightTrigger < 0.8f && inputRightTrigger >= 0.8f)
 		{
-			if(currenWeapon.isGrabbed)
-			{
+			character.PickupWeapon();
+		}
+
+		if(currenWeapon && !currenWeapon.isGrabbed)
+		{
+			//if(currenWeapon.isGrabbed)
+			//{
 				//Pickup
-				if(inputRightTrigger > 0.8f)
-					character.PickupWeapon();
-			}
-			else
-			{
+				/*if(inputRightTrigger > 0.8f)
+					character.PickupWeapon();*/
+			//}
+			//else
+			//{
 				//Throwing
 				if(inputRightTrigger < -0.5f)
 				{
@@ -80,19 +90,22 @@ public class Player : MonoBehaviour
 				}
 				else if(inputRightTrigger > 0.8f)
 				{
-					currenWeapon.RangedAttack();
+					currenWeapon.Attack();
 				}
-								
-				//Stab
-				if(inputLeftTrigger < -0.5f)
-				{					
-					currenWeapon.MeleeAttack();
-				}
-				else if(inputLeftTrigger > 0.8f)
+
+				if(currenWeapon.hasMeleeAttack)
 				{
-					currenWeapon.MeleeReturn();
+					//Stab
+					if(inputRightTrigger < -0.5f)
+					{				
+						currenWeapon.Draw();
+					}
+					else if(inputRightTrigger > 0.8f)
+					{
+						currenWeapon.MeleeAttack();
+					}
 				}
-			}
+			//}
 		}
 		else
 		{
@@ -101,6 +114,7 @@ public class Player : MonoBehaviour
 				character.GrabWeapon();
 		}
 	
+		previousInputRightTrigger = inputRightTrigger;
 
 		//Debug spawn spear
 		/*

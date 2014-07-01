@@ -7,23 +7,21 @@ public class Hammer : Weapon
 	public GameObject idle;
 	public GameObject attack;
 	public GameObject lying;
+	public GameObject ready;
 
-	public override bool isCarried{ get{ return state == CarryState;} }
 	public override bool isGrabbed{ get{ return state == GrabbedState;} }
 	public override bool isAttacking{ get{return state == AttackState;} }
-	public override bool isLying {get{return state == LyingState;} }
+	public override bool isDrawn{ get{return state == DrawnState;} }	
+	public override bool isFullyDrawn{ get{return state == DrawnState && drawTimer <= 0;} }	
 
-	private float attackCooldown = 0.5f;
-	private float attackDangerTime = 0.1f;
+	public float attackCooldown = 0.5f;
+	public float attackDangerTime = 0.1f;
+	public float drawDelay = 0.25f;
+
 	private float attackTimer;
+	private float drawTimer;
 
 	private List<WorldObject> squashTargets = new List<WorldObject>();
-
-	void Start()
-	{
-		if(state == null)
-			SetLyingState(Vector3.zero);
-	}
 
 	//States
 	public override void SetLyingState(Vector3 force)
@@ -33,6 +31,7 @@ public class Hammer : Weapon
 		idle.SetActive(false);
 		lying.SetActive(true);
 		attack.SetActive(false);
+		ready.SetActive(false);
 	}
 
 	public override void SetCarryState ()
@@ -40,10 +39,31 @@ public class Hammer : Weapon
 		idle.SetActive(true);
 		lying.SetActive(false);
 		attack.SetActive(false);
+		ready.SetActive(false);
 
 		squashTargets.Clear();
 
+		rigidbody.isKinematic = true;
+		
 		state = CarryState;
+	}
+
+	public void SetDrawnState()
+	{
+		idle.SetActive(false);
+		lying.SetActive(false);
+		attack.SetActive(false);
+		ready.SetActive(true);
+
+		drawTimer = drawDelay;
+			 
+		state = DrawnState;
+	}
+
+	public void DrawnState()
+	{
+		if(drawTimer > 0)
+			drawTimer -= Time.deltaTime;
 	}
 
 	public void SetAttackState()
@@ -51,6 +71,7 @@ public class Hammer : Weapon
 		idle.SetActive(false);
 		lying.SetActive(false);
 		attack.SetActive(true);
+		ready.SetActive(false);
 
 		attackTimer = attackCooldown;
 
@@ -61,20 +82,20 @@ public class Hammer : Weapon
 	{
 		if(attackTimer > 0)
 			attackTimer -= Time.deltaTime;
+		else
+			SetCarryState();
 	}
 
 	//Methods
-	public override bool GrabCheck(Character character)
-	{
-		return isLying;
-	}
-
 	public override Vector3 AdjustMovement(Vector3 moveForce)
 	{
-		if(isAttacking)
+		if(isAttacking || isGrabbed)
 			return Vector3.zero;
 
-		return moveForce * 0.3f;
+		if(isDrawn)
+			return moveForce * 0.05f;
+		else
+			return moveForce * 0.5f; 
 	}
 	
 	public override float AdjustRotation (float rotationForce)
@@ -87,13 +108,20 @@ public class Hammer : Weapon
 
 	public override void MeleeAttack()
 	{
-		if(isAttacking)
+		if(isAttacking || !isDrawn)
 			return;
 
-		owner.rigidbody.velocity /= 3f;
-		owner.AddForce(transform.forward * 100f);
+		if(isFullyDrawn)
+		{
+			owner.rigidbody.velocity /= 3f;
+			owner.AddForce(transform.forward * 100f);
 
-		SetAttackState();
+			SetAttackState();
+		}
+		else
+		{
+			SetCarryState();
+		}
 	}
 
 	public override void MeleeReturn()
@@ -103,6 +131,15 @@ public class Hammer : Weapon
 		
 		SetCarryState();
 	}
+
+	public override void Draw ()
+	{
+		if(isAttacking || isDrawn)
+			return;
+		
+		SetDrawnState();
+	}
+
 
 	//Collision
 	void OnTriggerEnter(Collider col)
