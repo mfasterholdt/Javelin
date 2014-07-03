@@ -1,0 +1,187 @@
+fileFormatVersion: 2
+guid: a233e65ab0452ca44bc53d57ba0a06da
+ModelImporter:
+  serializedVersion: 15
+  fileIDToRecycleName:
+    100000: ClavicleL
+    100002: ClavicleR
+    100004: ElbowL
+    100006: ElbowR
+    100008: FootL
+    100010: FootR
+    100012: Guy
+    100014: //RootNode
+    100016: HandL
+    100018: HandR
+    100020: Head
+    100022: Hip
+    100024: HipL
+    100026: HipR
+    100028: KneeL
+    100030: KneeR
+    100032: Logic
+    100034: Neck
+    100036: Rig
+    100038: ShoulderL
+    100040: ShoulderR
+    100042: SpineA
+    100044: SpineB
+    100046: Tie
+    400000: ClavicleL
+    400002: ClavicleR
+    400004: ElbowL
+    400006: ElbowR
+    400008: FootL
+    400010: FootR
+    400012: Guy
+    400014: //RootNode
+    400016: HandL
+    400018: HandR
+    400020: Head
+    400022: Hip
+    400024: HipL
+    400026: HipR
+    400028: KneeL
+    400030: KneeR
+    400032: Logic
+    400034: Neck
+    400036: Rig
+    400038: ShoulderL
+    400040: ShoulderR
+    400042: SpineA
+    400044: SpineB
+    400046: Tie
+    2300000: Tie
+    3300000: Tie
+    4300000: Guy
+    4300002: Tie
+    7400000: RunFast
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: Guy
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    animationCompression: 1
+    animationRotationError: 0
+    animationPositionError: 0
+    animationScaleError: 0
+    animationWrapMode: 2
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: RunFast
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 19
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Guy
+        weight: 1
+      - path: Rig
+        weight: 1
+      - path: Rig/Logic
+        weight: 1
+      - path: Rig/Logic/SpineA
+        weight: 1
+      - path: Rig/Logic/SpineA/Hip
+        weight: 1
+      - path: Rig/Logic/SpineA/Hip/HipL
+        weight: 1
+      - path: Rig/Logic/SpineA/Hip/HipL/KneeL
+        weight: 1
+      - path: Rig/Logic/SpineA/Hip/HipL/KneeL/FootL
+        weight: 1
+      - path: Rig/Logic/SpineA/Hip/HipR
+        weight: 1
+      - path: Rig/Logic/SpineA/Hip/HipR/KneeR
+        weight: 1
+      - path: Rig/Logic/SpineA/Hip/HipR/KneeR/FootR
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleL
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleL/ShoulderL
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleL/ShoulderL/ElbowL
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleL/ShoulderL/ElbowL/HandL
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleR
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleR/ShoulderR
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleR/ShoulderR/ElbowR
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/ClavicleR/ShoulderR/ElbowR/HandR
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/Neck
+        weight: 1
+      - path: Rig/Logic/SpineA/SpineB/Neck/Head
+        weight: 1
+      - path: Tie
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  userData: 
