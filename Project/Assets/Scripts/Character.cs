@@ -20,6 +20,7 @@ public class Character : WorldObject
 	public CollisionEvents grabTrigger;	
 
 	public Renderer visuals;
+	public Transform visualsHolder;
 	public Color deathColor;
 	public float hitDistance = 0.63f;
 
@@ -45,11 +46,16 @@ public class Character : WorldObject
 	BloodSplatter bloodSplatter;
 	private Vector3 spearHandOffset;
 
+	private Quaternion visualsInitialRotation;
+
 	void Start () 
 	{
 		characterRigidbody = rigidbody;
 		characterTransform = transform;
 		currentRotationSpeed = rotationSpeed;
+
+		if(visualsHolder)
+			visualsInitialRotation = visualsHolder.rotation;
 
 		spearHandOffset = hand.localPosition;
 
@@ -101,6 +107,11 @@ public class Character : WorldObject
 
 			if(isDead)
 				visuals.material.color = Color.Lerp (visuals.material.color, deathColor, Time.deltaTime * 2f);
+
+			if(visualsHolder)
+			{
+				visualsHolder.rotation = visualsInitialRotation;
+			}
 		}
 
 		/*if(spearReady && aimTimer < 7.5f)
@@ -123,14 +134,16 @@ public class Character : WorldObject
 		//*** add effect instead of detroying here
 		visuals.gameObject.SetActive(false);
 
-		if(!rigidbody.isKinematic)
+		if(rigidbody && !rigidbody.isKinematic)
 			rigidbody.velocity *= 0.2f;
 
 		mainCollider.gameObject.SetActive(false);
 
 		if(aim)
 			aim.gameObject.SetActive(false);
-		//rigidbody.isKinematic = true;
+
+		if(visualsHolder)
+			visualsHolder.gameObject.SetActive(false);
 	}
 
 	void Die()
