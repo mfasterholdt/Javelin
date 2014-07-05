@@ -124,7 +124,7 @@ public class EnemyAI : MonoBehaviour {
 
 		if(TargetSpotted())
 		{
-			float targetAngle = AimAtPlayer();
+			float targetAngle = AimPlayer();
 			Weapon currentWeapon = character.GetCurrentWeapon();
 
 			if(currentWeapon.isDrawn)
@@ -156,7 +156,7 @@ public class EnemyAI : MonoBehaviour {
 	{
 		if(!Player.IsActive)
 		{
-			AimAtPlayer();
+			AimPlayer();
 			return;
 		}
 
@@ -173,7 +173,7 @@ public class EnemyAI : MonoBehaviour {
 		if(TargetSpotted())
 		{
 			float dist = Vector3.Distance(target.pos, character.pos);
-			AimAtPlayer();
+			AimPlayer();
 
 			Weapon weapon = character.GetCurrentWeapon();
 
@@ -195,7 +195,7 @@ public class EnemyAI : MonoBehaviour {
 		}
 		else
 		{
-			AimInDirection(moveDir);
+			AimDirection(moveDir);
 		}
 	}
 
@@ -219,7 +219,7 @@ public class EnemyAI : MonoBehaviour {
 			}
 			else
 			{
-				float targetAngle = AimAtPlayer();
+				float targetAngle = AimPlayer();
 
 				if(targetAngle < 50f && weapon.isFullyDrawn)
 				{
@@ -265,7 +265,7 @@ public class EnemyAI : MonoBehaviour {
 
 		if(currentWeapon.isDrawn)
 		{
-			float targetAngle = AimAtPlayer();
+			float targetAngle = AimPlayer();
 
 			if(currentWeapon is Laser)
 			{
@@ -331,6 +331,7 @@ public class EnemyAI : MonoBehaviour {
 
 				Vector3 dir = path.GetDirection();
 				character.Move(dir.x * findSpearSpeed, dir.z * findSpearSpeed);
+				AimDirection(dir);
 			}
 
 			if(debug)
@@ -391,7 +392,7 @@ public class EnemyAI : MonoBehaviour {
 		return false;
 	}
 	
-	protected float AimAtPlayer()
+	protected float AimPlayer()
 	{
 		Vector3 aim = target.pos - character.hand.transform.position;
 
@@ -400,7 +401,7 @@ public class EnemyAI : MonoBehaviour {
 		return Vector3.Angle(aim, character.handHolder.transform.forward);
 	}
 
-	protected float AimInDirection(Vector3 dir)
+	protected float AimDirection(Vector3 dir)
 	{
 		character.Aim(dir);
 

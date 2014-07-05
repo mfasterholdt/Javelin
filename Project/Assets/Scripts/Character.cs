@@ -13,7 +13,7 @@ public class Character : WorldObject
 
 	private List<Weapon> weaponsInReach = new List<Weapon>();
 
-	public Transform aim;
+	public Transform aim;		
 	public Transform handHolder;
 	public Transform hand;
 
@@ -31,12 +31,20 @@ public class Character : WorldObject
 	public float minSpeed = 4f;//Add boost while slower than minSpeed
 	public float rotationSpeed = 15f;
 
+	public AnimControl anim;
+	public AnimationClip animIdle;
+	public AnimationClip animRun;
+	public AnimationClip animDie;
+	public AnimationClip animAim;
+
+
 	private Transform characterTransform;
 	private float currentRotationSpeed;
 	private Weapon currentWeapon;
 	private float minInput = 0.35f;
 	private Rigidbody characterRigidbody;
 	private Vector3 aimTarget;
+	private float currentVelocity;
 
 	private delegate void State();
 	private State state;
@@ -103,15 +111,33 @@ public class Character : WorldObject
 	{
 		if(state != null)
 		{
+			//***Temp animation test
+			if(!isDead)
+			{
+				currentVelocity = characterRigidbody.velocity.magnitude;	
+
+				if(anim)
+				{
+					if(currentVelocity > 1)
+						anim.PlayAnim(animRun.name);
+					else
+						anim.PlayAnim(animIdle.name);
+				}
+			}
+			else
+			{
+				anim.PlayAnim(animDie.name);
+			}
 			state();
 
 			if(isDead)
 				visuals.material.color = Color.Lerp (visuals.material.color, deathColor, Time.deltaTime * 2f);
 
+			//***do we need this?
 			if(visualsHolder)
-			{
 				visualsHolder.rotation = visualsInitialRotation;
-			}
+
+
 		}
 
 		/*if(spearReady && aimTimer < 7.5f)
@@ -155,8 +181,7 @@ public class Character : WorldObject
 
 	public void Move(float inputX, float inputZ)
 	{
-		Vector3 vel = characterRigidbody.velocity;
-		float currentVelocity = vel.magnitude;		
+		Vector3 vel = characterRigidbody.velocity;			
 		Vector3 moveForce = Vector3.zero;
 
 		//Input

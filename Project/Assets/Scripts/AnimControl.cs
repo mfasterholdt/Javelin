@@ -6,45 +6,44 @@ public class AnimControl : MonoBehaviour
 	public float fps = 12f;
 	public float animSpeed = 0.5f;
 
-	public bool useFrameTime = true;
-	public float frameTime = 1f;
+	//public bool useFrameTime = true;
+	//public float frameTime = 1f;
 
 	private Animation anim;
 	private AnimationState currentState;
 
 	private float animTimer;
-	private float frameRate;
+	//private float frameRate;
 
 	void Start () 
 	{
 		anim = animation;	
+
+		//frameRate = anim.clip.frameRate;
+		
+		foreach(AnimationState state in anim)
+		{
+			state.speed = 0;			
+		}
+
 		PlayAnim(anim.clip);
 	}
 
-	void PlayAnim(AnimationClip clip)
+	public void PlayAnim(AnimationClip clip)
 	{
 		PlayAnim(clip.name);
 	}
 
-	void PlayAnim(AnimationState state)
+	public void PlayAnim(string clipName)
 	{
-		PlayAnim(state.name);
 
-	}
-
-	void PlayAnim(string clipName)
-	{
 		AnimationState state = anim[clipName];
 
-		if(!state)
+		if(!state || state == currentState)
 			return;
 
 		currentState = state;
-		currentState.speed = 0;
-		frameRate = currentState.clip.frameRate;
-
 		animTimer = 0;
-
 		anim.Play(currentState.name);
 	}
 
@@ -52,7 +51,7 @@ public class AnimControl : MonoBehaviour
 	{
 		if(currentState != null)
 		{
-			if(useFrameTime)
+			/*if(useFrameTime)
 			{
 				//Flip one frame forward per time interval
 				animTimer += Time.deltaTime;
@@ -64,12 +63,12 @@ public class AnimControl : MonoBehaviour
 				}
 			}
 			else
-			{
+			{*/
 				//Set animation time based on rounded timer
 				animTimer += Time.deltaTime * animSpeed;
-				float t = animTimer - (animTimer % (1 / fps));
+				float t = animTimer - (animTimer % (1 / fps));				
 				currentState.time = t;
-			}
+			//}
 		}
 	}
 }
