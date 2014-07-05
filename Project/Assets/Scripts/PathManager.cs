@@ -28,7 +28,7 @@ public class PathManager : MonoBehaviour
 	private List<Vector3> lastPlayerPath;
 
 	public static PathManager Instance;
-	public static float gridSpacing = 1f;
+	public static int gridSpacing = 5;
 
 	public static Vector2int[] directions = new Vector2int[]{new Vector2int(1,1), new Vector2int(0,1), new Vector2int(-1,1), new Vector2int(1,0),new Vector2int(-1,0), new Vector2int(1,-1), new Vector2int(0,-1), new Vector2int(-1,-1)};
 
@@ -158,7 +158,7 @@ public class PathManager : MonoBehaviour
 
 		if(Physics.Raycast(startPos, dir, dir.magnitude, connectionMask) == false)
 		{
-			return new List<Vector3>{startPos, goalPos};
+			//return new List<Vector3>{startPos, goalPos};
 		}
 
 		//Do pathfinding
@@ -255,8 +255,8 @@ public class PathManager : MonoBehaviour
 	public PathNode WorldToPathNode(Vector3 pos)
 	{
 		//Primary node
-		int x = Mathf.RoundToInt(pos.x - managerTransform.position.x);
-		int y = Mathf.RoundToInt(pos.z - managerTransform.position.z);
+		int x = Mathf.RoundToInt((pos.x - managerTransform.position.x) / gridSpacing); //int x = Mathf.RoundToInt(pos.x - managerTransform.position.x);
+		int y = Mathf.RoundToInt((pos.z - managerTransform.position.z) / gridSpacing); //int y = Mathf.RoundToInt(pos.z - managerTransform.position.z);
 
 		if(InsideBounds(x,y))
 		{

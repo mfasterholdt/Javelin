@@ -34,6 +34,7 @@ public class Character : WorldObject
 	public AnimControl anim;
 	public AnimationClip animIdle;
 	public AnimationClip animRun;
+	public AnimationClip animRunFast;
 	public AnimationClip animDie;
 	public AnimationClip animAim;
 
@@ -119,7 +120,10 @@ public class Character : WorldObject
 			{
 				if(!isDead)
 				{
-					if(currentVelocity > 1)
+					/*if(currentVelocity > 7)
+						anim.PlayAnim(animRunFast.name);
+					else */
+					if(currentVelocity > 3)
 						anim.PlayAnim(animRun.name);
 					else
 						anim.PlayAnim(animIdle.name);
@@ -237,7 +241,7 @@ public class Character : WorldObject
 			z = Mathf.Min (z, 6f);*/
 			    
 			newAim.z += z; 
-
+			newAim.y = aim.localPosition.y;
 			aim.localPosition = newAim;
 
 			//Debug.DrawLine(hand.position, aim.position, Color.red);

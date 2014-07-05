@@ -180,6 +180,10 @@ public class Spear : Weapon
 		if(isGrabbed)
 			return moveForce * 0.2f;
 
+		//Stand still on drawn
+		//if(isDrawn)
+		//	return Vector3.zero;
+
 		//Vector3 adjustedMove = moveForce - moveForce * 2f; //***Get weight here
 		//Debug.Log(Vector3.Dot(adjustedMove, moveForce));
 

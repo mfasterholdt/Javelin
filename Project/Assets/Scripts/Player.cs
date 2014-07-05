@@ -54,6 +54,9 @@ public class Player : MonoBehaviour
 		inputAim.x = Input.GetAxis("HorizontalRight");
 		inputAim.z = Input.GetAxis("VerticalRight");
 
+		//inputAim.x = Input.GetAxis("Horizontal");
+		//inputAim.z = Input.GetAxis("Vertical");
+
 		character.Aim(inputAim);
 	}
 
