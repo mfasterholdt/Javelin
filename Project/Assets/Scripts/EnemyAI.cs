@@ -34,6 +34,7 @@ public class EnemyAI : MonoBehaviour {
 	private float meleeTimer;
 
 	private Path path;
+	private bool targetSpotted;
 
 	void Start () 
 	{
@@ -52,6 +53,8 @@ public class EnemyAI : MonoBehaviour {
 	{		
 		if(target.GetIsDead())
 			SetTargetDeadState();
+		else if(targetSpotted)
+			SetChaseState();
 		else if(isPatrolling)
 			SetPatrolState();
 		else if(isStationary)
@@ -71,7 +74,7 @@ public class EnemyAI : MonoBehaviour {
 		if(!Player.IsActive)
 			return;
 		
-		//if(PlayerSpotted())
+		if(TargetSpotted())
 			SetChaseState();
 	}
 
@@ -141,6 +144,7 @@ public class EnemyAI : MonoBehaviour {
 
 	void SetChaseState()
 	{
+		targetSpotted = true;
 
 		if(character.GetCurrentWeapon())
 		{
@@ -308,16 +312,11 @@ public class EnemyAI : MonoBehaviour {
 
 	void FindWeaponState()
 	{
-		Weapon grabbedWeapon = character.GetGrabbedWeapon();
+		Weapon currentWeapon = character.GetCurrentWeapon();
 
-		if(grabbedWeapon)
+		if(currentWeapon)
 		{
-			//Pickup spear and chase
-			character.PickupWeapon();
-			Weapon currentWeapon = character.GetCurrentWeapon();
-
-			if(currentWeapon && currentWeapon.isCarried)			
-				SetChaseState();
+			SetChaseState();
 		}
 		else
 		{
@@ -328,21 +327,17 @@ public class EnemyAI : MonoBehaviour {
 			{
 				Vector3 spearPos = nearestWeapon.transform.position - nearestWeapon.transform.forward;
 				path.UpdatePath(spearPos);
-
+				
 				Vector3 dir = path.GetDirection();
 				character.Move(dir.x * findSpearSpeed, dir.z * findSpearSpeed);
 				AimDirection(dir);
 			}
-
+			
 			if(debug)
 				path.DrawCurrentPath();
-
-			//Grab spear
+			
 			if(character.GetWeaponsInReach().Count > 0)
-			{
-				//character.PickupWeapon();
-				character.GrabWeapon();
-			}
+				character.PickupWeapon();
 		}
 	}
 

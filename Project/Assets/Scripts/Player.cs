@@ -110,7 +110,7 @@ public class Player : MonoBehaviour
 		else
 		{
 			//Grab weapon
-			if(inputRightTrigger < -0.5f)
+			if(previousInputRightTrigger > -0.5f &&inputRightTrigger <= -0.5f)
 				character.GrabWeapon();
 		}
 	

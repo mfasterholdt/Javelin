@@ -8,15 +8,19 @@ public class Laser : Weapon
 
 	public float attackDelay = 0.5f;
 	public float maxChargeTime = 1.5f;
+	public float cooldownDelay = 2f;
 
 	public override bool isAttacking{ get{return state == AttackState;} }
 	public override bool isDrawn{ get{return state == DrawnState;} }
+	public bool isCoolingdown{ get{return state == CooldownState;} }
 
 	private float reach = 30f;
 	private float drawnTimer;
 	private float attackTimer;
 	private Vector3 attackDir;
 	private Vector3 impactPos;
+	
+	private float cooldownTimer;	
 
 	public override void SetLyingState (Vector3 force)
 	{
@@ -107,7 +111,26 @@ public class Laser : Weapon
 		}
 		else
 		{
-			beam.gameObject.SetActive(false);
+			SetCooldownState();
+		}
+	}
+
+
+	public void SetCooldownState()
+	{
+		beam.gameObject.SetActive(false);		
+		cooldownTimer = cooldownDelay;
+		state = CooldownState;
+	}
+
+	void CooldownState ()
+	{
+		if(cooldownTimer > 0)
+		{
+			cooldownTimer -= Time.deltaTime;
+		}
+		else
+		{
 			SetCarryState();
 		}
 	}
@@ -124,7 +147,7 @@ public class Laser : Weapon
 
 	public override void Draw ()
 	{
-		if(isAttacking || isGrabbed || isDrawn)
+		if(isAttacking || isGrabbed || isDrawn || isCoolingdown)
 			return;
 		
 		//owner.Draw();//***Animation or visualise here

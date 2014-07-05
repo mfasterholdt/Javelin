@@ -111,23 +111,25 @@ public class Character : WorldObject
 	{
 		if(state != null)
 		{
-			//***Temp animation test
-			if(!isDead)
-			{
+			if(characterRigidbody)
 				currentVelocity = characterRigidbody.velocity.magnitude;	
 
-				if(anim)
+			//***Temp animation test
+			if(anim)
+			{
+				if(!isDead)
 				{
 					if(currentVelocity > 1)
 						anim.PlayAnim(animRun.name);
 					else
 						anim.PlayAnim(animIdle.name);
 				}
+				else
+				{
+					anim.PlayAnim(animDie.name);
+				}
 			}
-			else
-			{
-				anim.PlayAnim(animDie.name);
-			}
+
 			state();
 
 			if(isDead)
@@ -324,7 +326,7 @@ public class Character : WorldObject
 			{
 				Weapon weapon = weaponsInReach[i];
 				
-				if(weapon.isLying)
+				if(weapon.isLying || weapon.isImpaling)
 					optimalWeapon = weapon;
 			}
 
